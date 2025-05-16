@@ -2,14 +2,13 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   test-backend:
     runs-on: ubuntu-24.04
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,7 +33,7 @@ jobs:
       - name: Run tests
         run: mvn -f sample-api/pom.xml test
 
-  build-and-push-docker-image:
+  build-and-push-docker-images:
     needs: test-backend
     runs-on: ubuntu-24.04
 
@@ -49,19 +48,19 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./sample-api
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api-backend:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-sample-api:latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build and push database image
         uses: docker/build-push-action@v6
         with:
           context: ./database
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api-database:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build and push httpd image
         uses: docker/build-push-action@v6
         with:
           context: ./httpd
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api-httpd:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
           push: ${{ github.ref == 'refs/heads/main' }}
