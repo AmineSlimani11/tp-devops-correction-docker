@@ -1,10 +1,14 @@
-name: CI/CD Pipeline
+name: CI devops 2025
 
 on:
   push:
-    branches: [ main ]
+    branches: 
+      - main
+      - develop
   pull_request:
-    branches: [ main ]
+    branches: 
+      - main
+      - develop
 
 jobs:
   test-backend:
@@ -16,19 +20,19 @@ jobs:
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '21'
+          distribution: temurin
+          java-version: 21
 
-      - name: Build and test with Maven + SonarCloud analysis
+      - name: Build and test with Maven + SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
           SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
-        run: mvn -B verify sonar:sonar \
-          -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-          -Dsonar.organization=${SONAR_ORGANIZATION} \
+        run: mvn -B clean verify sonar:sonar \
+          -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
+          -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
           -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.login=${SONAR_TOKEN} \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
           --file ./simple-api/pom.xml
 
   build-and-push-docker-images:
@@ -59,5 +63,5 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./http-server
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-http-server:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
           push: ${{ github.ref == 'refs/heads/main' }}
