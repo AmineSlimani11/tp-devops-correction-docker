@@ -31,3 +31,29 @@ jobs:
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            
+  owasp-security-scan:
+    runs-on: ubuntu-24.04
+    needs: test-backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install OWASP Dependency-Check
+        run: |
+          curl -L https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip -o dc.zip
+          unzip dc.zip -d dc
+
+      - name: Run Dependency-Check
+        run: |
+          ./dc/dependency-check/bin/dependency-check.sh \
+            --project "simple-api" \
+            --scan ./simple-api \
+            --format "HTML" \
+            --out ./dependency-check-report
+
+      - name: Upload OWASP report
+        uses: actions/upload-artifact@v4
+        with:
+          name: owasp-report
+          path: ./dependency-check-report
