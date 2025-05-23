@@ -26,10 +26,10 @@ jobs:
       - name: SonarCloud Scan
         working-directory: ./simple-api
         run: mvn -B verify sonar:sonar \
-          -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
-          -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
+          -Dsonar.projectKey=AmineSlimani11_tp-devops-correction-docker \
+          -Dsonar.organization=amineslimani11 \
           -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          -Dsonar.login=${{ secrets.SONAR_TOKEN}}
 
         
   build-and-push-docker-images:
