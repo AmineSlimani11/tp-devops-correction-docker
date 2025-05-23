@@ -1,22 +1,49 @@
-name: CD - Build and push docker images
+name: CD
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  build-and-push:
+  build-and-push-docker-images:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract tag from commit or use default
+        id: vars
+        run: |
+          TAG=$(echo "${GITHUB_SHA::7}")
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
 
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:${{ github.sha }}
 
       - name: Build and push backend image
         uses: docker/build-push-action@v6
         with:
           context: ./simple-api
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
           push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-backend:${{ steps.vars.outputs.tag }}
+
+      - name: Build and push database image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./database
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:${{ steps.vars.outputs.tag }}
+
+      - name: Build and push http-server image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./http-server
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:${{ steps.vars.outputs.tag }}
