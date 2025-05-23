@@ -10,6 +10,8 @@ on:
 jobs:
   test-backend:
     runs-on: ubuntu-24.04
+    outputs:
+      tests_passed: ${{ steps.tests.outcome }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,9 +23,12 @@ jobs:
           java-version: 21
 
       - name: Build and test with Maven
-        run: mvn clean verify --file ./simple-api/pom.xml
+        id: tests
+        run: |
+          mvn clean verify --file ./simple-api/pom.xml
 
       - name: SonarCloud Scan
+        if: success()
         working-directory: ./simple-api
         run: |
           mvn -B verify sonar:sonar \
@@ -31,3 +36,39 @@ jobs:
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+  owasp-scan:
+    needs: test-backend
+    runs-on: ubuntu-24.04
+    if: success()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install OWASP Dependency-Check
+        run: |
+          curl -L https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip -o dc.zip
+          unzip dc.zip -d dc
+
+      - name: Run Dependency-Check
+        run: |
+          ./dc/dependency-check/bin/dependency-check.sh \
+            --project "simple-api" \
+            --scan ./simple-api \
+            --format "HTML" \
+            --out ./dependency-check-report
+
+      - name: Upload OWASP Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: ./dependency-check-report
+
+  rollback-on-failure:
+    needs: test-backend
+    if: failure()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Notify rollback action
+        run: |
+          echo "Tests failed — manual rollback or revert required."
