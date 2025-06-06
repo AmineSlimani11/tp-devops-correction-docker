@@ -1,5 +1,12 @@
+- name: Pull latest database image
+  community.docker.docker_image:
+    name: aminesl/tp-devops-database
+    tag: latest
+    source: pull
+    force_source: true
+
 - name: Launch PostgreSQL
-  docker_container:
+  community.docker.docker_container:
     name: database
     image: aminesl/tp-devops-database:latest
     pull: true
