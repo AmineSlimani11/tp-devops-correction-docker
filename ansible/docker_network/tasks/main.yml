@@ -1,0 +1,6 @@
+- name: Create Docker network
+  docker_network:
+    name: mynetwork
+    state: present
+    ipam_config:
+      - subnet: 172.25.0.0/16

@@ -1,0 +1,11 @@
+- name: Run proxy container with local image
+  docker_container:
+    name: my_proxy
+    image: aminesl/tp-devops-httpd:latest
+    ports:
+      - "80:80"
+    networks:
+      - name: mynetwork
+    env:
+      USERNAME: aminesl
+    state: started
