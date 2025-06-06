@@ -14,5 +14,5 @@
     ports:
       - "8080:8080"
     env:
-      DATABASE_HOST: "{{ DB_HOST }}"
-      DATABASE_PASSWORD: "{{ DB_PASSWORD }}"
+      DATABASE_HOST: ${{ secrets.DB_HOST }}
+      DATABASE_PASSWORD: ${{ secrets.DB_PASSWORD }}
