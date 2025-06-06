@@ -1,8 +1,14 @@
+- name: Pull latest backend image
+  community.docker.docker_image:
+    name: aminesl/tp-devops-simple-api
+    tag: latest
+    source: pull
+    force_source: true
+
 - name: Run backend application
-  docker_container:
+  community.docker.docker_container:
     name: simple-api
     image: aminesl/tp-devops-simple-api:latest
-    pull: true
     networks:
       - name: mynetwork
     ports:
