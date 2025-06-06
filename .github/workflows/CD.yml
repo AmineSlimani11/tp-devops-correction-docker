@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - ajout-ansible
 
 jobs:
   build-and-push-docker-images:
