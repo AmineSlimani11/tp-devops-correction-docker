@@ -1,5 +1,12 @@
-- name: Run proxy container with local image
-  docker_container:
+- name: Pull latest proxy image
+  community.docker.docker_image:
+    name: aminesl/tp-devops-httpd
+    tag: latest
+    source: pull
+    force_source: true
+
+- name: Run proxy container
+  community.docker.docker_container:
     name: my_proxy
     image: aminesl/tp-devops-httpd:latest
     pull: true
