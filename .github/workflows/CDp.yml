@@ -33,4 +33,5 @@ jobs:
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
-          ansible-playbook -i ansible/inventories/setup.yml ansible/main.yml -u ${{ secrets.ANSIBLE_USER }}
+          ansible-playbook -i ansible/inventories/setup.yml ansible/main.yml -u ${{ secrets.ANSIBLE_USER }}       --extra-vars "PG_USER=$PG_USER PG_PASSWORD=$PG_PASSWORD PG_DB=$PG_DB DB_HOST=$DB_HOST DB_PASSWORD=$DB_PASSWORD"
+
