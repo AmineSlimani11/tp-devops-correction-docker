@@ -1,10 +1,10 @@
 name: CD
 
 on:
-  push:
-    branches:
-      - main
-      - ajout-ansible
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
 
 jobs:
   build-and-push-docker-images:
