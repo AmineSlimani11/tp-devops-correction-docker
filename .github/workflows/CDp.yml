@@ -1,0 +1,31 @@
+name: Déploiement Ansible
+
+on:
+  workflow_run:
+    workflows: ["CD"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Configurer l'agent SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Installer Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Exécuter le playbook Ansible
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: false
+        run: |
+          ansible-playbook -i ansible/inventories/setup.yml ansible/main.yml -u ${{ secrets.ANSIBLE_USER }}
