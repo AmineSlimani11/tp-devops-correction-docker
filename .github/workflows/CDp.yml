@@ -1,4 +1,4 @@
-name: Continuous Deployment
+name: Déploiement Ansible
 
 on:
   push:
@@ -11,20 +11,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Récupérer le dépôt
         uses: actions/checkout@v4
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.4
+      - name: Configurer l'agent SSH
+        uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Install Ansible
+      - name: Installer Ansible
         run: |
           sudo apt update
           sudo apt install -y ansible
 
-      - name: Run Ansible Playbook
+      - name: Exécuter le playbook Ansible
         env:
           ANSIBLE_HOST_KEY_CHECKING: false
         run: |
