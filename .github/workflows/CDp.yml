@@ -1,10 +1,10 @@
 name: Déploiement Ansible
 
 on:
-  push:
-    branches:
-      - main
-      - ajout-ansible
+  workflow_run:
+    workflows: ["CD"]
+    types:
+      - completed
 
 jobs:
   deploy:
