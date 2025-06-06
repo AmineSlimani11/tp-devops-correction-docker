@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+      - ajout-ansible
   pull_request:
 
 jobs:
